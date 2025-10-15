@@ -51,4 +51,7 @@ Lab 2: Automated Web Server Configuration Using Ansible Playbooks
     # From the contoller node 
         $ ssh vagrant@192.168.1.10
         $ curl localhost:80
+    #From the browser write this url
+        $ http://192.168.1.10:80
+
 
