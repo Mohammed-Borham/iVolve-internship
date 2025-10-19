@@ -1,0 +1,52 @@
+---
+- name: Secure MySQL setup with Ansible Vault
+  hosts: web
+  become: yes
+  vars_files:
+    - vars/vault.yml
+
+  tasks:
+
+    - name: Install MySQL server
+      apt:
+        name: mysql-server
+        state: present
+        update_cache: yes
+
+    - name: Ensure MySQL service is running
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Install Python MySQL client for Ansible
+      apt:
+        name: python3-pymysql
+        state: present
+
+    - name: Create MySQL database
+      community.mysql.mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      become_user: root
+
+    - name: Create MySQL user
+      community.mysql.mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
+        host: "%"
+        state: present
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      become_user: root
+
+    - name: Verify database connection
+      shell: >
+        mysql -u {{ db_user }} -p{{ db_password }} -e "SHOW DATABASES;"
+      register: db_output
+      changed_when: false
+
+    - name: Display database list
+      debug:
+        var: db_output.stdout_lines

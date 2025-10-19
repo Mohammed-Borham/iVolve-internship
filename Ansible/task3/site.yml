@@ -1,0 +1,9 @@
+---
+- name: Configure DevOps Tools
+  hosts: Devops-tools
+  become: yes
+
+  roles:
+    - docker
+    - kubectl
+    - jenkins
